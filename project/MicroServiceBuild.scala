@@ -11,22 +11,41 @@ object MicroServiceBuild extends Build with MicroService {
 
   override lazy val appDependencies: Seq[ModuleID] = compile ++ test()
 
+  private val bootstrap = "5.9.0"
+  private val logback = "3.1.0"
+  private val playBinders = "2.0.0"
+  private val playConfig = "3.1.0"
+  private val playHealth = "2.0.0"
+  private val awsSns = "1.11.97"
+  private val playHmrcApiVersion = "1.3.0"
+
+
   val compile = Seq(
     ws,
-    "uk.gov.hmrc" %% "microservice-bootstrap" % "5.13.0",
-    "uk.gov.hmrc" %% "play-authorisation" % "4.3.0",
-    "uk.gov.hmrc" %% "play-health" % "2.1.0",
-    "uk.gov.hmrc" %% "play-url-binders" % "2.1.0",
-    "uk.gov.hmrc" %% "play-config" % "4.2.0",
-    "uk.gov.hmrc" %% "logback-json-logger" % "3.1.0",
-    "uk.gov.hmrc" %% "domain" % "4.1.0"
+    "uk.gov.hmrc" %% "microservice-bootstrap" % bootstrap,
+    "uk.gov.hmrc" %% "play-health" % playHealth,
+    "uk.gov.hmrc" %% "play-hmrc-api" % playHmrcApiVersion,
+    "uk.gov.hmrc" %% "play-url-binders" % playBinders,
+    "uk.gov.hmrc" %% "play-config" % playConfig,
+    "uk.gov.hmrc" %% "logback-json-logger" % logback,
+    "com.amazonaws" % "aws-java-sdk-sns" % awsSns
   )
 
-  def test(scope: String = "test,it") = Seq(
-    "uk.gov.hmrc" %% "hmrctest" % "2.3.0" % scope,
-    "org.scalatest" %% "scalatest" % "2.2.6" % scope,
-    "org.pegdown" % "pegdown" % "1.6.0" % scope,
-    "com.typesafe.play" %% "play-test" % PlayVersion.current % scope
-  )
+  private val scalaTestPlus = "1.5.1"
+  private val hmrcTest = "2.2.0"
+  private val scalactic = "2.2.6"
+  private val pegdown = "1.6.0"
+  private val mockitoCore = "1.9.0"
 
+  def test(scope: String = "test,it") = {
+    Seq(
+      "uk.gov.hmrc" %% "hmrctest" % hmrcTest % scope,
+      "org.scalactic" %% "scalactic" % scalactic % scope,
+      "org.scalatest" %% "scalatest" % scalactic % scope,
+      "org.pegdown" % "pegdown" % pegdown % scope,
+      "org.scalatestplus.play" %% "scalatestplus-play" % scalaTestPlus,
+      "com.typesafe.play" %% "play-test" % PlayVersion.current % scope,
+      "org.mockito" % "mockito-core" % mockitoCore % scope
+    )
+  }
 }

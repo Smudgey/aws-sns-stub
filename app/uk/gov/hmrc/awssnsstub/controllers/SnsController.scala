@@ -19,22 +19,25 @@ package uk.gov.hmrc.awssnsstub.controllers
 import javax.inject.Singleton
 
 import play.api.mvc._
+import uk.gov.hmrc.awssnsstub.controllers.sns.{CreatePlatformEndpoint, FailedSnsAction, PublishRequest, UnsupportedSnsAction}
 import uk.gov.hmrc.play.microservice.controller.BaseController
 
 import scala.concurrent.Future._
 import scala.language.postfixOps
 
 @Singleton
-class SnsController extends BaseController {
+class SnsController extends BaseController with SnsActionBinding {
 
-	def handleRequest(): Action[Map[String, Seq[String]]] = SnsRequestAction.async(parse tolerantFormUrlEncoded) {
-    request =>
-      successful(request.action match {
-              case r:CreatePlatformEndpoint => Ok(CreatePlatformEndpointResponse(r) success)
-              case r:PublishRequest         => Ok(PublishRequestResponse(r) success)
-              case f:FailedSnsAction        => BadRequest(f.error)
-              case UnknownSnsAction         => NotImplemented
-            })
-	}
+	def handleRequest(): Action[FormEncoded] = Action.async(parse.urlFormEncoded) { implicit request =>
+
+    val response: Result = bind(request.body) match {
+      case ep@CreatePlatformEndpoint(_,_) => Ok(CreatePlatformEndpointResponse(ep) success)
+      case pr@PublishRequest(_,_)         => Ok(PublishRequestResponse(pr) success)
+      case FailedSnsAction(error)         => BadRequest(error)
+      case UnsupportedSnsAction(actionId) => NotImplemented(s"The SNS Action $actionId has not been implemented")
+    }
+
+    successful(response)
+  }
 }
 

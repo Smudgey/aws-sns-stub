@@ -18,6 +18,8 @@ package uk.gov.hmrc.awssnsstub.controllers
 
 import java.util.UUID
 
+import uk.gov.hmrc.awssnsstub.controllers.sns.{CreatePlatformEndpoint, PublishRequest}
+
 import scala.xml.Elem
 
 case class CreatePlatformEndpointResponse(endpoint: CreatePlatformEndpoint) {
@@ -28,14 +30,10 @@ case class CreatePlatformEndpointResponse(endpoint: CreatePlatformEndpoint) {
   def success: Elem = {
     <CreatePlatformEndpointResponse xmlns="http://sns.amazonaws.com/doc/2010-03-31/">
       <CreatePlatformEndpointResult>
-        <EndpointArn>
-          {arn}
-        </EndpointArn>
+        <EndpointArn>{arn}</EndpointArn>
       </CreatePlatformEndpointResult>
       <ResponseMetadata>
-        <RequestId>
-          {id}
-        </RequestId>
+        <RequestId>{id}</RequestId>
       </ResponseMetadata>
     </CreatePlatformEndpointResponse>
   }

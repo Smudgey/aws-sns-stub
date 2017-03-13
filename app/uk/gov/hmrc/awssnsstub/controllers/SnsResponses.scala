@@ -24,7 +24,7 @@ import scala.xml.Elem
 
 case class CreatePlatformEndpointResponse(endpoint: CreatePlatformEndpoint) {
 
-  val id: String = UUID.randomUUID().toString
+  val id: String = s"${endpoint.applicationArn}/${endpoint.registrationToken}"
   val arn: String = s"${endpoint.applicationArn}/stubbed/$id"
 
   def success: Elem = {

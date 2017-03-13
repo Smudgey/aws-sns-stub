@@ -41,15 +41,14 @@ case class CreatePlatformEndpointResponse(endpoint: CreatePlatformEndpoint) {
 
 case class PublishRequestResponse(publishRequest: PublishRequest) {
 
-  val rid: String = UUID.randomUUID().toString
-  val mid: String = publishRequest.targetArn
+  val id: String = publishRequest.targetArn
 
   def success: Elem = {
     <PublishResponse xmlns="http://sns.amazonaws.com/doc/2010-03-31/">
       <PublishResult>
-        <MessageId>{mid}</MessageId>
+        <MessageId>{id}</MessageId>
       </PublishResult> <ResponseMetadata>
-      <RequestId>{rid}</RequestId>
+      <RequestId>{id}</RequestId>
     </ResponseMetadata>
     </PublishResponse>
   }

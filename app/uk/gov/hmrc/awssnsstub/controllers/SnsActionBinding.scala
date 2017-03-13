@@ -24,7 +24,7 @@ trait SnsActionBinding {
 
   type FormEncoded = Map[String, Seq[String]]
 
-  def withActionId(data:FormEncoded)(failure: SnsAction)(success: String => SnsAction) : SnsAction = {
+  private def withActionId(data:FormEncoded)(failure: SnsAction)(success: String => SnsAction) : SnsAction = {
     data.get("Action")
       .flatMap(_.headOption filter(_.nonEmpty))
       .fold(failure)(success)

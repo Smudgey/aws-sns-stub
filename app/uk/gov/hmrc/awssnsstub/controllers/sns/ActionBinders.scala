@@ -28,7 +28,7 @@ object CreatePlatformEndpointBinder extends SnsBinder {
 
   override val actionId: String = "CreatePlatformEndpoint"
 
-  val form = Form(
+  val form: Form[CreatePlatformEndpoint] = Form(
     mapping( "PlatformApplicationArn" -> text, "Token" -> text )
     (CreatePlatformEndpoint.apply)(CreatePlatformEndpoint.unapply)
   )
@@ -45,7 +45,7 @@ object PublishRequestBinder extends SnsBinder {
 
   override val actionId: String = "Publish"
 
-  val form = Form(
+  val form: Form[PublishRequest] = Form(
     mapping( "Message" -> text, "TargetArn" -> text )
     (PublishRequest.apply)(PublishRequest.unapply)
   )

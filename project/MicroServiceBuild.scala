@@ -11,7 +11,7 @@ object MicroServiceBuild extends Build with MicroService {
 
   override lazy val appDependencies: Seq[ModuleID] = compile ++ test()
 
-  private val bootstrap = "5.9.0"
+  private val bootstrap = "5.15.0"
   private val logback = "3.1.0"
   private val playBinders = "2.0.0"
   private val playConfig = "3.1.0"

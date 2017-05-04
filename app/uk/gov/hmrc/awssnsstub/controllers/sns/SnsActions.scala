@@ -16,12 +16,20 @@
 
 package uk.gov.hmrc.awssnsstub.controllers.sns
 
-trait SnsAction
-case class UnsupportedSnsAction(actionId:String) extends SnsAction
-case class FailedSnsAction(error: String) extends SnsAction
+import play.api.libs.json._
+import julienrf.json.derived
+
+sealed trait SnsAction
+
 case class PublishRequest(message: String, targetArn: String) extends SnsAction
+
 case class CreatePlatformEndpoint(applicationArn: String, registrationToken: String) extends SnsAction
 
-//{
-//  val error = s"Unsupported Action[$actionId]"
-//}
+case class UnsupportedSnsAction(actionId: String) extends SnsAction
+
+case class FailedSnsAction(error: String) extends SnsAction
+
+object SnsAction {
+  implicit val formats: Format[SnsAction] = derived.oformat
+  implicit val writes: Writes[SnsAction] = derived.owrites
+}

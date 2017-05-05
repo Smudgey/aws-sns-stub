@@ -16,9 +16,13 @@
 
 package uk.gov.hmrc.awssnsstub
 
+import javax.inject.{Inject, Provider}
+
 import com.google.inject.AbstractModule
 import play.api.Mode.Mode
 import play.api.{Configuration, Environment}
+import play.modules.reactivemongo.ReactiveMongoComponent
+import reactivemongo.api.DB
 import uk.gov.hmrc.play.config.ServicesConfig
 
 class GuiceModule(environment: Environment, configuration: Configuration) extends AbstractModule with ServicesConfig {
@@ -27,6 +31,10 @@ class GuiceModule(environment: Environment, configuration: Configuration) extend
   override protected lazy val runModeConfiguration: Configuration = configuration
 
   override def configure(): Unit = {
-    
+    bind(classOf[DB]).toProvider(classOf[MongoDbProvider])
   }
+}
+
+class MongoDbProvider @Inject() (reactiveMongoComponent: ReactiveMongoComponent) extends Provider[DB] {
+  def get = reactiveMongoComponent.mongoConnector.db()
 }

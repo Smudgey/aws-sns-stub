@@ -16,28 +16,36 @@
 
 package uk.gov.hmrc.awssnsstub.controllers
 
-import javax.inject.Singleton
+import javax.inject.{Inject, Singleton}
 
 import play.api.mvc._
 import uk.gov.hmrc.awssnsstub.controllers.sns.{CreatePlatformEndpoint, FailedSnsAction, PublishRequest, UnsupportedSnsAction}
+import uk.gov.hmrc.awssnsstub.repository.SnsSentMessageRepository
 import uk.gov.hmrc.play.microservice.controller.BaseController
 
-import scala.concurrent.Future._
+import scala.concurrent.Future
 import scala.language.postfixOps
+import scala.concurrent.ExecutionContext.Implicits.global
 
 @Singleton
-class SnsController extends BaseController with SnsActionBinding {
+class SnsController @Inject()(snsSentMessageRepository: SnsSentMessageRepository) extends BaseController with SnsActionBinding {
 
-	def handleRequest(): Action[FormEncoded] = Action.async(parse.urlFormEncoded) { implicit request =>
+  def handleRequest(): Action[FormEncoded] = Action.async(parse.urlFormEncoded) { implicit request =>
 
-    val response: Result = bind(request.body) match {
-      case ep@CreatePlatformEndpoint(_,_) => Ok(CreatePlatformEndpointResponse(ep) success)
-      case pr@PublishRequest(_,_)         => Ok(PublishRequestResponse(pr) success)
-      case FailedSnsAction(error)         => BadRequest(error)
-      case UnsupportedSnsAction(actionId) => NotImplemented(s"The SNS Action $actionId has not been implemented")
+    bind(request.body) match {
+      case ep: CreatePlatformEndpoint => snsSentMessageRepository.insert(ep)
+        .map(_ => Ok(CreatePlatformEndpointResponse(ep) success))
+        .recover {
+          case ex: Exception => InternalServerError(ex.getMessage)
+        }
+      case pr: PublishRequest => snsSentMessageRepository.insert(pr)
+        .map(_ => Ok(PublishRequestResponse(pr) success))
+        .recover {
+          case ex:Exception => InternalServerError(ex.getMessage)
+        }
+      case FailedSnsAction(error) => Future(BadRequest(error))
+      case UnsupportedSnsAction(actionId) => Future(NotImplemented(s"The SNS Action $actionId has not been implemented"))
     }
-
-    successful(response)
   }
 }
 

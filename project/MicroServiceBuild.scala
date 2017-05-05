@@ -16,9 +16,9 @@ object MicroServiceBuild extends Build with MicroService {
   private val playBinders = "2.0.0"
   private val playConfig = "3.1.0"
   private val playHealth = "2.0.0"
+  private val playReactiveMongo = "5.2.0"
   private val awsSns = "1.11.97"
   private val playHmrcApiVersion = "1.3.0"
-
 
   val compile = Seq(
     ws,
@@ -28,6 +28,8 @@ object MicroServiceBuild extends Build with MicroService {
     "uk.gov.hmrc" %% "play-url-binders" % playBinders,
     "uk.gov.hmrc" %% "play-config" % playConfig,
     "uk.gov.hmrc" %% "logback-json-logger" % logback,
+    "uk.gov.hmrc" %% "play-reactivemongo" % playReactiveMongo,
+    "org.julienrf" %% "play-json-derived-codecs" % "3.3",
     "com.amazonaws" % "aws-java-sdk-sns" % awsSns
   )
 

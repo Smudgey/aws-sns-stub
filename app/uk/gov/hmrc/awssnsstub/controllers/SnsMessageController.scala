@@ -27,17 +27,34 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.language.postfixOps
 
 @Singleton
-class SnsTestEndpointsController @Inject()(snsActionRepository: SnsSentMessageRepository) extends BaseController with SnsActionBinding {
+class SnsMessageController @Inject()(snsActionRepository: SnsSentMessageRepository) extends BaseController with SnsActionBinding {
 
-  def getLatestSentMessage() = Action.async { implicit request =>
+  def getLatestMessage() = Action.async { implicit request =>
     snsActionRepository.findLatestMessage().map {
       case Some(message) => Ok(Json.toJson(message.action))
       case None => NotFound("No messages have been sent.")
     }
   }
 
+  def getCreateEndpointMessages(registrationToken: Option[String]) = Action.async { implicit request =>
+    registrationToken match {
+      case Some(token) => snsActionRepository.findMessages("CreatePlatformEndpoint", Map("registrationToken" -> token))
+        .map(results => results.map(_.action))
+        .map(results => Ok(Json.toJson(results)))
+        .recover {
+          case ex: Exception => InternalServerError(ex.getMessage)
+        }
+      case None => snsActionRepository.findMessages("CreatePlatformEndpoint")
+        .map(results => results.map(_.action))
+        .map(results => Ok(Json.toJson(results)))
+        .recover {
+          case ex: Exception => InternalServerError(ex.getMessage)
+        }
+    }
+  }
+
   def deleteAllSentMessages() = Action.async { implicit request =>
-    snsActionRepository.removeAll().map(wr => Ok("Messages deleted."))
+    snsActionRepository.removeAll().map(_ => Ok("Messages deleted."))
   }
 }
 

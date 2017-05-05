@@ -25,22 +25,14 @@ trait WithTestApplication extends BeforeAndAfterAll {
 
   this: Suite =>
 
-  lazy val fakeApplication: Application = if(configureTestApp.nonEmpty){
-    new GuiceApplicationBuilder()
-      .bindings(bindModules: _*)
-      .configure("metrics.enabled" -> "false")
-      .configure("auditing.enabled" -> "false")
-      .configure(configureTestApp)
-      .build()
-  } else {
-    new GuiceApplicationBuilder()
-      .bindings(bindModules: _*)
-      .configure("metrics.enabled" -> "false")
-      .configure("auditing.enabled" -> "false")
-      .build()
-  }
-
-  def configureTestApp: Map[String,  Any] = Map()
+  lazy val fakeApplication: Application = new GuiceApplicationBuilder()
+    .bindings(bindModules: _*)
+    .configure("metrics.enabled" -> "false")
+    .configure("auditing.enabled" -> "false")
+    .configure(configureTestApp)
+    .build()
+  
+  def configureTestApp: Map[String, Any] = Map()
 
   def bindModules: Seq[GuiceableModule] = Seq()
 

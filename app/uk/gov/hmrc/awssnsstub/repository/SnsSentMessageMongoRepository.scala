@@ -53,11 +53,30 @@ class SnsSentMessageMongoRepository @Inject()(mongo: DB)
       .sort(Json.obj("timestamp" -> -1))
       .one[SnsMessagePersist](ReadPreference.primaryPreferred)
   }
+
+  def findMessages(messageType: String): Future[List[SnsMessagePersist]] = findMessages(messageType, Map())
+
+  def findMessages(messageType: String, messageProperties: Map[String, String]): Future[List[SnsMessagePersist]] = {
+    val messageTypeQuery = Json.obj(s"action.$messageType" -> Json.obj("$exists" -> true))
+
+    val messagePropertiesQuery = messageProperties.map(tuple => Json.obj(s"action.$messageType.${tuple._1}" -> tuple._2))
+      .fold(Json.obj())((next, acc) => acc ++ next)
+
+    collection.find(messageTypeQuery ++ messagePropertiesQuery)
+      .sort(Json.obj("timestamp" -> -1))
+      .cursor[SnsMessagePersist](ReadPreference.primaryPreferred)
+      .collect[List]()
+  }
 }
 
 @ImplementedBy(classOf[SnsSentMessageMongoRepository])
 trait SnsSentMessageRepository extends Repository[SnsMessagePersist, BSONObjectID] {
+
   def insert(snsAction: SnsAction): Future[WriteResult]
 
   def findLatestMessage(): Future[Option[SnsMessagePersist]]
+
+  def findMessages(messageType: String): Future[List[SnsMessagePersist]]
+
+  def findMessages(messageType: String, queryParams: Map[String, String]): Future[List[SnsMessagePersist]]
 }

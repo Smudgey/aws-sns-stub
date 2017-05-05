@@ -34,14 +34,14 @@ class SnsController @Inject()(snsActionRepository: SnsSentMessageRepository) ext
 
     bind(request.body) match {
       case ep: CreatePlatformEndpoint => snsActionRepository.insert(ep)
-        .map(wr => Ok(CreatePlatformEndpointResponse(ep) success))
+        .map(_ => Ok(CreatePlatformEndpointResponse(ep) success))
         .recover {
-          case ex: Exception => InternalServerError("An exception occurred persisting the message.")
+          case ex: Exception => InternalServerError(ex.getMessage)
         }
       case pr: PublishRequest => snsActionRepository.insert(pr)
-        .map(wr => Ok(PublishRequestResponse(pr) success))
+        .map(_ => Ok(PublishRequestResponse(pr) success))
         .recover {
-          case ex:Exception => InternalServerError("An exception occurred persisting the message.")
+          case ex:Exception => InternalServerError(ex.getMessage)
         }
       case FailedSnsAction(error) => Future(BadRequest(error))
       case UnsupportedSnsAction(actionId) => Future(NotImplemented(s"The SNS Action $actionId has not been implemented"))

@@ -29,6 +29,9 @@ import scala.language.postfixOps
 @Singleton
 class SnsSentMessageController @Inject()(snsSentMessageRepository: SnsSentMessageRepository) extends BaseController with SnsActionBinding {
 
+
+  //TODO Add spec to test all the test endpoints below.
+
   def getLatestMessage() = Action.async { implicit request =>
     snsSentMessageRepository.findLatestMessage().map {
       case Some(message) => Ok(Json.toJson(message.action))
@@ -45,6 +48,23 @@ class SnsSentMessageController @Inject()(snsSentMessageRepository: SnsSentMessag
           case ex: Exception => InternalServerError(ex.getMessage)
         }
       case None => snsSentMessageRepository.findMessages("CreatePlatformEndpoint")
+        .map(results => results.map(_.action))
+        .map(results => Ok(Json.toJson(results)))
+        .recover {
+          case ex: Exception => InternalServerError(ex.getMessage)
+        }
+    }
+  }
+
+  def getPublishRequestMessages(targetArn: Option[String]) = Action.async { implicit request =>
+    targetArn match {
+      case Some(arn) => snsSentMessageRepository.findMessages("PublishRequest", Map("targetArn" -> arn))
+        .map(results => results.map(_.action))
+        .map(results => Ok(Json.toJson(results)))
+        .recover {
+          case ex: Exception => InternalServerError(ex.getMessage)
+        }
+      case None => snsSentMessageRepository.findMessages("PublishRequest")
         .map(results => results.map(_.action))
         .map(results => Ok(Json.toJson(results)))
         .recover {

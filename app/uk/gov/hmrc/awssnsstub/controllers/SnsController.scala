@@ -28,17 +28,17 @@ import scala.language.postfixOps
 import scala.concurrent.ExecutionContext.Implicits.global
 
 @Singleton
-class SnsController @Inject()(snsActionRepository: SnsSentMessageRepository) extends BaseController with SnsActionBinding {
+class SnsController @Inject()(snsSentMessageRepository: SnsSentMessageRepository) extends BaseController with SnsActionBinding {
 
   def handleRequest(): Action[FormEncoded] = Action.async(parse.urlFormEncoded) { implicit request =>
 
     bind(request.body) match {
-      case ep: CreatePlatformEndpoint => snsActionRepository.insert(ep)
+      case ep: CreatePlatformEndpoint => snsSentMessageRepository.insert(ep)
         .map(_ => Ok(CreatePlatformEndpointResponse(ep) success))
         .recover {
           case ex: Exception => InternalServerError(ex.getMessage)
         }
-      case pr: PublishRequest => snsActionRepository.insert(pr)
+      case pr: PublishRequest => snsSentMessageRepository.insert(pr)
         .map(_ => Ok(PublishRequestResponse(pr) success))
         .recover {
           case ex:Exception => InternalServerError(ex.getMessage)

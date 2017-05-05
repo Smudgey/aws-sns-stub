@@ -76,7 +76,7 @@ class SnsControllerSpec extends ControllerSpec with MockitoSugar {
     }
 
     "respond with 500 if persisting CreatePlatformEndpoint Actions fails" in {
-      when(sentMessageRepository.insert(any[SnsAction])).thenReturn(Future.failed(new RuntimeException))
+      when(sentMessageRepository.insert(any[SnsAction])).thenReturn(Future.failed(new RuntimeException("Error!")))
       val endpoint = CreatePlatformEndpoint("applicationArn", "registrationToken")
 
       val data: Seq[(String, String)] = Seq(
@@ -91,7 +91,7 @@ class SnsControllerSpec extends ControllerSpec with MockitoSugar {
     }
 
     "respond with 500 if persisting Publish Actions fails" in {
-      when(sentMessageRepository.insert(any[SnsAction])).thenReturn(Future.failed(new RuntimeException))
+      when(sentMessageRepository.insert(any[SnsAction])).thenReturn(Future.failed(new RuntimeException("Error!")))
       val publish = PublishRequest("Tax is fun!", "targetArn")
 
       val data: Seq[(String, String)] = Seq(

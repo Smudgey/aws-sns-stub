@@ -27,10 +27,10 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.language.postfixOps
 
 @Singleton
-class SnsMessageController @Inject()(snsActionRepository: SnsSentMessageRepository) extends BaseController with SnsActionBinding {
+class SnsSentMessageController @Inject()(snsSentMessageRepository: SnsSentMessageRepository) extends BaseController with SnsActionBinding {
 
   def getLatestMessage() = Action.async { implicit request =>
-    snsActionRepository.findLatestMessage().map {
+    snsSentMessageRepository.findLatestMessage().map {
       case Some(message) => Ok(Json.toJson(message.action))
       case None => NotFound("No messages have been sent.")
     }
@@ -38,13 +38,13 @@ class SnsMessageController @Inject()(snsActionRepository: SnsSentMessageReposito
 
   def getCreateEndpointMessages(registrationToken: Option[String]) = Action.async { implicit request =>
     registrationToken match {
-      case Some(token) => snsActionRepository.findMessages("CreatePlatformEndpoint", Map("registrationToken" -> token))
+      case Some(token) => snsSentMessageRepository.findMessages("CreatePlatformEndpoint", Map("registrationToken" -> token))
         .map(results => results.map(_.action))
         .map(results => Ok(Json.toJson(results)))
         .recover {
           case ex: Exception => InternalServerError(ex.getMessage)
         }
-      case None => snsActionRepository.findMessages("CreatePlatformEndpoint")
+      case None => snsSentMessageRepository.findMessages("CreatePlatformEndpoint")
         .map(results => results.map(_.action))
         .map(results => Ok(Json.toJson(results)))
         .recover {
@@ -54,7 +54,7 @@ class SnsMessageController @Inject()(snsActionRepository: SnsSentMessageReposito
   }
 
   def deleteAllSentMessages() = Action.async { implicit request =>
-    snsActionRepository.removeAll().map(_ => Ok("Messages deleted."))
+    snsSentMessageRepository.removeAll().map(_ => Ok("Messages deleted."))
   }
 }
 

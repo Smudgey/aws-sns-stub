@@ -1,7 +1,8 @@
 # microservice specific routes
 
-POST          /                                @uk.gov.hmrc.awssnsstub.controllers.SnsController.handleRequest()
+POST          /                                        @uk.gov.hmrc.awssnsstub.controllers.SnsController.handleRequest()
 
-DELETE        /messages                        @uk.gov.hmrc.awssnsstub.controllers.SnsSentMessageController.deleteAllSentMessages()
-GET           /messages/latest                 @uk.gov.hmrc.awssnsstub.controllers.SnsSentMessageController.getLatestMessage()
-GET           /messages/create-endpoint        @uk.gov.hmrc.awssnsstub.controllers.SnsSentMessageController.getCreateEndpointMessages(registrationToken: Option[String])
+DELETE        /messages                                @uk.gov.hmrc.awssnsstub.controllers.SnsSentMessageController.deleteAllSentMessages()
+GET           /messages/latest                         @uk.gov.hmrc.awssnsstub.controllers.SnsSentMessageController.getLatestMessage()
+GET           /messages/create-endpoint-request        @uk.gov.hmrc.awssnsstub.controllers.SnsSentMessageController.getCreateEndpointMessages(registrationToken: Option[String])
+GET           /messages/publish-request                @uk.gov.hmrc.awssnsstub.controllers.SnsSentMessageController.getPublishRequestMessages(targetArn: Option[String])

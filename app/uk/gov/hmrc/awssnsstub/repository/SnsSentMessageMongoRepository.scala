@@ -23,7 +23,7 @@ import org.joda.time.DateTime
 import play.api.libs.json.{Format, Json}
 import reactivemongo.api.commands.WriteResult
 import reactivemongo.api.{DB, ReadPreference}
-import reactivemongo.bson.BSONObjectID
+import reactivemongo.bson.{BSONDocument, BSONObjectID}
 import uk.gov.hmrc.awssnsstub.controllers.sns.SnsAction
 import uk.gov.hmrc.mongo.{ReactiveRepository, Repository}
 import uk.gov.hmrc.mongo.json.ReactiveMongoFormats
@@ -54,6 +54,16 @@ class SnsSentMessageMongoRepository @Inject()(mongo: DB)
       .one[SnsMessagePersist](ReadPreference.primaryPreferred)
   }
 
+  def findMessageFromToken(token:String): Future[Option[SnsMessagePersist]] = {
+    collection.find(BSONDocument("action.CreatePlatformEndpoint.registrationToken" -> token))
+      .one[SnsMessagePersist](ReadPreference.primaryPreferred)
+  }
+
+  def findSentMessageFromToken(token:String): Future[Option[SnsMessagePersist]] = {
+    collection.find(BSONDocument("action.PublishRequest.targetArn" -> s"default-platform-arn/stubbed/default-platform-arn/$token"))
+      .one[SnsMessagePersist](ReadPreference.primaryPreferred)
+  }
+
   def findMessages(messageType: String): Future[List[SnsMessagePersist]] = findMessages(messageType, Map())
 
   def findMessages(messageType: String, messageProperties: Map[String, String]): Future[List[SnsMessagePersist]] = {
@@ -75,6 +85,10 @@ trait SnsSentMessageRepository extends Repository[SnsMessagePersist, BSONObjectI
   def insert(snsAction: SnsAction): Future[WriteResult]
 
   def findLatestMessage(): Future[Option[SnsMessagePersist]]
+
+  def findMessageFromToken(token:String): Future[Option[SnsMessagePersist]]
+
+  def findSentMessageFromToken(token:String): Future[Option[SnsMessagePersist]]
 
   def findMessages(messageType: String): Future[List[SnsMessagePersist]]
 

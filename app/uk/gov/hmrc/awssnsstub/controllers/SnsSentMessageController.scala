@@ -30,12 +30,24 @@ import scala.language.postfixOps
 class SnsSentMessageController @Inject()(snsSentMessageRepository: SnsSentMessageRepository) extends BaseController with SnsActionBinding {
 
 
-  //TODO Add spec to test all the test endpoints below.
-
   def getLatestMessage() = Action.async { implicit request =>
     snsSentMessageRepository.findLatestMessage().map {
       case Some(message) => Ok(Json.toJson(message.action))
       case None => NotFound("No messages have been sent.")
+    }
+  }
+
+  def getMessageFromToken(token:String) = Action.async { implicit request =>
+    snsSentMessageRepository.findMessageFromToken(token).map {
+      case Some(message) => Ok(Json.toJson(message.action))
+      case None => NotFound
+    }
+  }
+
+  def getSentMessageFromToken(token:String) = Action.async { implicit request =>
+    snsSentMessageRepository.findSentMessageFromToken(token).map {
+      case Some(message) => Ok(Json.toJson(message.action))
+      case None => NotFound
     }
   }
 

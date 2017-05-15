@@ -27,7 +27,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 class SnsActionMongoRepositorySpec extends UnitSpec with ScalaFutures with WithTestApplication with BeforeAndAfterEach {
 
-  private val snsActionRepository = fakeApplication.injector.instanceOf[SnsSentMessageRepository]
+  lazy val snsActionRepository = fakeApplication.injector.instanceOf[SnsSentMessageRepository]
 
   private def createPlatformEndpoint(id: Int) = CreatePlatformEndpoint(s"endpointArn_$id", s"token_$id")
 
@@ -35,11 +35,12 @@ class SnsActionMongoRepositorySpec extends UnitSpec with ScalaFutures with WithT
 
     override def beforeEach() {
       implicit val patienceConfig = PatienceConfig(scaled(Span(500, Millis)), scaled(Span(15, Millis)))
-      val result = snsActionRepository.removeAll().futureValue
+      await(snsActionRepository.removeAll())
     }
 
   "When some SnsActions are stored" should {
     "then the latest should retrievable" in {
+
       val i1 = snsActionRepository.insert(createPlatformEndpoint(1))
       val i2 = snsActionRepository.insert(publishRequest(2))
       val i3 = snsActionRepository.insert(createPlatformEndpoint(3))

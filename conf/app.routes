@@ -6,3 +6,6 @@ DELETE        /messages                                @uk.gov.hmrc.awssnsstub.c
 GET           /messages/latest                         @uk.gov.hmrc.awssnsstub.controllers.SnsSentMessageController.getLatestMessage()
 GET           /messages/create-endpoint-request        @uk.gov.hmrc.awssnsstub.controllers.SnsSentMessageController.getCreateEndpointMessages(registrationToken: Option[String])
 GET           /messages/publish-request                @uk.gov.hmrc.awssnsstub.controllers.SnsSentMessageController.getPublishRequestMessages(targetArn: Option[String])
+
+GET           /messages/:token                         @uk.gov.hmrc.awssnsstub.controllers.SnsSentMessageController.getMessageFromToken(token)
+GET           /messages/publish-request/:token         @uk.gov.hmrc.awssnsstub.controllers.SnsSentMessageController.getSentMessageFromToken(token)

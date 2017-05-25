@@ -20,7 +20,7 @@ import javax.inject.{Inject, Provider}
 
 import com.google.inject.AbstractModule
 import play.api.Mode.Mode
-import play.api.{Configuration, Environment}
+import play.api.{Logger, Configuration, Environment}
 import play.modules.reactivemongo.ReactiveMongoComponent
 import reactivemongo.api.DB
 import uk.gov.hmrc.play.config.ServicesConfig
@@ -36,5 +36,6 @@ class GuiceModule(environment: Environment, configuration: Configuration) extend
 }
 
 class MongoDbProvider @Inject() (reactiveMongoComponent: ReactiveMongoComponent) extends Provider[DB] {
+  Logger.warn(s"Mongo URI ${reactiveMongoComponent.mongoConnector.mongoConnectionUri}")
   def get = reactiveMongoComponent.mongoConnector.db()
 }

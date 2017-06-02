@@ -54,9 +54,7 @@ class CallbackController () extends BaseController with SnsActionBinding {
           Future.successful(BadRequest)
         },
         callback => {
-
-// TODO...ADD TO MESSAGE WITH THE STATUS!!!
-println(" CREATE THE KEY ... " + s"${callback.response.messageId}-${callback.status}")
+          Logger.info(s"Recording key ${callback.response.messageId}-${callback.status}")
 
           // Record the key against the message Id and the status.
           callbackMap += (s"${callback.response.messageId}-${callback.status}" -> callback)

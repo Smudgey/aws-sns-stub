@@ -9,3 +9,7 @@ GET           /messages/publish-request                @uk.gov.hmrc.awssnsstub.c
 
 GET           /messages/:token                         @uk.gov.hmrc.awssnsstub.controllers.SnsSentMessageController.getMessageFromToken(token)
 GET           /messages/publish-request/:token         @uk.gov.hmrc.awssnsstub.controllers.SnsSentMessageController.getSentMessageFromToken(token)
+
+POST          /callback                                @uk.gov.hmrc.awssnsstub.controllers.CallbackController.clientCallback()
+GET           /callback/:messageId                     @uk.gov.hmrc.awssnsstub.controllers.CallbackController.getClientRequest(messageId)
+DELETE        /callback/reset                          @uk.gov.hmrc.awssnsstub.controllers.CallbackController.reset()

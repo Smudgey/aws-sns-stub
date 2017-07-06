@@ -37,6 +37,17 @@ case class CreatePlatformEndpointResponse(endpoint: CreatePlatformEndpoint) {
       </ResponseMetadata>
     </CreatePlatformEndpointResponse>
   }
+
+  def failure: Elem = {
+    <ErrorResponse xmlns="http://sns.amazonaws.com/doc/2010-03-31/">
+      <Error>
+        <Type>Sender</Type>
+        <Code>NotFound</Code>
+        <Message>PlatformApplication does not exist</Message>
+      </Error>
+      <RequestId>{id}</RequestId>
+    </ErrorResponse>
+  }
 }
 
 case class PublishRequestResponse(publishRequest: PublishRequest) {
@@ -51,5 +62,16 @@ case class PublishRequestResponse(publishRequest: PublishRequest) {
       <RequestId>{id}</RequestId>
     </ResponseMetadata>
     </PublishResponse>
+  }
+
+  val failure: Elem = {
+    <ErrorResponse xmlns="http://sns.amazonaws.com/doc/2010-03-31/">
+      <Error>
+        <Type>Sender</Type>
+        <Code>InvalidParameter</Code>
+        <Message>Invalid parameter: TargetArn Reason: No endpoint found for the target arn specified</Message>
+      </Error>
+      <RequestId>{id}</RequestId>
+    </ErrorResponse>
   }
 }

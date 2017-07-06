@@ -56,7 +56,7 @@ class SnsControllerSpec extends ControllerSpec with MockitoSugar {
   "SnsController CreatePlatformEndpoint Actions" should {
 
     "respond with 200 for and persist the message" in {
-      when(sentMessageRepository.insert(any[SnsAction])).thenReturn(Future(mock[WriteResult]))
+      when(sentMessageRepository.insert(any[SnsAction], any[Boolean])).thenReturn(Future(mock[WriteResult]))
       val endpoint = CreatePlatformEndpoint("applicationArn", "registrationToken")
 
       val data: Seq[(String, String)] = Seq(
@@ -70,11 +70,11 @@ class SnsControllerSpec extends ControllerSpec with MockitoSugar {
       status(resultFuture) mustBe OK
       contentAsXml(resultFuture) mustBe CreatePlatformEndpointResponse(endpoint).success
 
-      verify(sentMessageRepository).insert(endpoint)
+      verify(sentMessageRepository).insert(endpoint, isFailure = false)
     }
 
     "respond with a 400 error response given a 'forced failure' token" in {
-      when(sentMessageRepository.insert(any[SnsAction])).thenReturn(Future(mock[WriteResult]))
+      when(sentMessageRepository.insert(any[SnsAction], any[Boolean])).thenReturn(Future(mock[WriteResult]))
       val endpoint = CreatePlatformEndpoint("applicationArn", s"some-$forcedFailureNamePart-token")
 
       val data: Seq[(String, String)] = Seq(
@@ -88,11 +88,11 @@ class SnsControllerSpec extends ControllerSpec with MockitoSugar {
       status(resultFuture) mustBe BAD_REQUEST
       contentAsXml(resultFuture) mustBe CreatePlatformEndpointResponse(endpoint).failure
 
-      verify(sentMessageRepository).insert(endpoint)
+      verify(sentMessageRepository).insert(endpoint, isFailure = true)
     }
 
     "respond with 500 if persisting CreatePlatformEndpoint Actions fails" in {
-      when(sentMessageRepository.insert(any[SnsAction])).thenReturn(Future.failed(new RuntimeException("Error!")))
+      when(sentMessageRepository.insert(any[SnsAction], any[Boolean])).thenReturn(Future.failed(new RuntimeException("Error!")))
       val endpoint = CreatePlatformEndpoint("applicationArn", "registrationToken")
 
       val data: Seq[(String, String)] = Seq(
@@ -109,7 +109,7 @@ class SnsControllerSpec extends ControllerSpec with MockitoSugar {
 
   "SnsController Publish Actions" should {
     "respond with 200 for Publish Actions and persist the message" in {
-      when(sentMessageRepository.insert(any[SnsAction])).thenReturn(Future(mock[WriteResult]))
+      when(sentMessageRepository.insert(any[SnsAction], any[Boolean])).thenReturn(Future(mock[WriteResult]))
       val publish = PublishRequest("Tax is fun!", "targetArn")
 
       val data: Seq[(String, String)] = Seq(
@@ -123,11 +123,11 @@ class SnsControllerSpec extends ControllerSpec with MockitoSugar {
       status(resultFuture) mustBe OK
       contentAsXml(resultFuture) mustBe PublishRequestResponse(publish).success
 
-      verify(sentMessageRepository).insert(publish)
+      verify(sentMessageRepository).insert(publish, isFailure = false)
     }
 
     "respond with a 400 error response given a 'forced failure' token" in {
-      when(sentMessageRepository.insert(any[SnsAction])).thenReturn(Future(mock[WriteResult]))
+      when(sentMessageRepository.insert(any[SnsAction], any[Boolean])).thenReturn(Future(mock[WriteResult]))
       val publish = PublishRequest("Tax is fun!", s"/some/$forcedFailureNamePart/arn")
 
       val data: Seq[(String, String)] = Seq(
@@ -141,11 +141,11 @@ class SnsControllerSpec extends ControllerSpec with MockitoSugar {
       status(resultFuture) mustBe BAD_REQUEST
       contentAsXml(resultFuture) mustBe PublishRequestResponse(publish).failure
 
-      verify(sentMessageRepository).insert(publish)
+      verify(sentMessageRepository).insert(publish, isFailure = true)
     }
 
     "respond with 500 if persisting Publish Actions fails" in {
-      when(sentMessageRepository.insert(any[SnsAction])).thenReturn(Future.failed(new RuntimeException("Error!")))
+      when(sentMessageRepository.insert(any[SnsAction], any[Boolean])).thenReturn(Future.failed(new RuntimeException("Error!")))
       val publish = PublishRequest("Tax is fun!", "targetArn")
 
       val data: Seq[(String, String)] = Seq(

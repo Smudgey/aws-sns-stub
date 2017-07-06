@@ -41,9 +41,9 @@ class SnsActionMongoRepositorySpec extends UnitSpec with ScalaFutures with WithT
   "When some SnsActions are stored" should {
     "then the latest should retrievable" in {
 
-      val i1 = snsActionRepository.insert(createPlatformEndpoint(1))
-      val i2 = snsActionRepository.insert(publishRequest(2))
-      val i3 = snsActionRepository.insert(createPlatformEndpoint(3))
+      val i1 = snsActionRepository.insert(createPlatformEndpoint(1), isFailure = false)
+      val i2 = snsActionRepository.insert(publishRequest(2), isFailure = true)
+      val i3 = snsActionRepository.insert(createPlatformEndpoint(3), isFailure = false)
 
       val result = for {
         _ <- i1
@@ -61,12 +61,13 @@ class SnsActionMongoRepositorySpec extends UnitSpec with ScalaFutures with WithT
         }
         case _ => fail()
       }
+      result.get.isFailure shouldBe false
     }
 
     "then you should be able to find them by type" in {
-      val i1 = snsActionRepository.insert(createPlatformEndpoint(1))
-      val i2 = snsActionRepository.insert(publishRequest(2))
-      val i3 = snsActionRepository.insert(createPlatformEndpoint(3))
+      val i1 = snsActionRepository.insert(createPlatformEndpoint(1), isFailure = false)
+      val i2 = snsActionRepository.insert(publishRequest(2), isFailure = false)
+      val i3 = snsActionRepository.insert(createPlatformEndpoint(3), isFailure = false)
 
       val result = for {
         _ <- i1
@@ -83,12 +84,13 @@ class SnsActionMongoRepositorySpec extends UnitSpec with ScalaFutures with WithT
         }
         case _ => fail()
       }
+      result(0).isFailure shouldBe false
     }
 
     "then you should be able to find them by type and message properties" in {
-      val i1 = snsActionRepository.insert(createPlatformEndpoint(1))
-      val i2 = snsActionRepository.insert(publishRequest(2))
-      val i3 = snsActionRepository.insert(createPlatformEndpoint(3))
+      val i1 = snsActionRepository.insert(createPlatformEndpoint(1), isFailure = true)
+      val i2 = snsActionRepository.insert(publishRequest(2), isFailure = false)
+      val i3 = snsActionRepository.insert(createPlatformEndpoint(3), isFailure = false)
 
       val result = for {
         _ <- i1
@@ -105,6 +107,7 @@ class SnsActionMongoRepositorySpec extends UnitSpec with ScalaFutures with WithT
         }
         case _ => fail()
       }
+      result(0).isFailure shouldBe true
     }
 
   }

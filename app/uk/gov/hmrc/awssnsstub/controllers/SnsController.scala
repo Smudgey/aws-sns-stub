@@ -35,7 +35,7 @@ class SnsController @Inject()(snsSentMessageRepository: SnsSentMessageRepository
     bind(request.body) match {
       case ep: CreatePlatformEndpoint =>
         val forcedFailure = ep.registrationToken.contains(forcedFailureNamePart)
-        snsSentMessageRepository.insert(ep).map { _ =>
+        snsSentMessageRepository.insert(ep, forcedFailure).map { _ =>
           if (forcedFailure) {
             BadRequest(CreatePlatformEndpointResponse(ep) failure)
           } else {
@@ -46,7 +46,7 @@ class SnsController @Inject()(snsSentMessageRepository: SnsSentMessageRepository
         }
       case pr: PublishRequest =>
         val forcedFailure = pr.targetArn.contains(forcedFailureNamePart)
-        snsSentMessageRepository.insert(pr).map { _ =>
+        snsSentMessageRepository.insert(pr, forcedFailure).map { _ =>
           if (forcedFailure) {
             BadRequest(PublishRequestResponse(pr) failure)
           } else {

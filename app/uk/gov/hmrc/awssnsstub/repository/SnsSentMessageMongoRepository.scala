@@ -31,7 +31,7 @@ import uk.gov.hmrc.mongo.json.ReactiveMongoFormats
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-case class SnsMessagePersist(timestamp: Long, action: SnsAction)
+case class SnsMessagePersist(timestamp: Long, action: SnsAction, isFailure: Boolean)
 
 object SnsMessagePersist {
   implicit val idFormats = ReactiveMongoFormats.objectIdFormats
@@ -44,8 +44,8 @@ class SnsSentMessageMongoRepository @Inject()(mongo: DB)
   extends ReactiveRepository[SnsMessagePersist, BSONObjectID]("sns-messages", () => mongo, SnsMessagePersist.mongoFormats, ReactiveMongoFormats.objectIdFormats)
     with SnsSentMessageRepository {
 
-  def insert(snsAction: SnsAction): Future[WriteResult] = {
-    insert(SnsMessagePersist(DateTime.now().getMillis, snsAction))
+  def insert(snsAction: SnsAction, isFailure: Boolean): Future[WriteResult] = {
+    insert(SnsMessagePersist(DateTime.now().getMillis, snsAction, isFailure))
   }
 
   def findLatestMessage(): Future[Option[SnsMessagePersist]] = {
@@ -82,7 +82,7 @@ class SnsSentMessageMongoRepository @Inject()(mongo: DB)
 @ImplementedBy(classOf[SnsSentMessageMongoRepository])
 trait SnsSentMessageRepository extends Repository[SnsMessagePersist, BSONObjectID] {
 
-  def insert(snsAction: SnsAction): Future[WriteResult]
+  def insert(snsAction: SnsAction, isFailure: Boolean): Future[WriteResult]
 
   def findLatestMessage(): Future[Option[SnsMessagePersist]]
 

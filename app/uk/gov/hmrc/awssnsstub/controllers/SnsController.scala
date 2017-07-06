@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.awssnsstub.controllers
 
-import javax.inject.{Inject, Singleton}
+import javax.inject.{Inject, Named, Singleton}
 
 import play.api.mvc._
 import uk.gov.hmrc.awssnsstub.controllers.sns.{CreatePlatformEndpoint, FailedSnsAction, PublishRequest, UnsupportedSnsAction}
@@ -28,18 +28,31 @@ import scala.language.postfixOps
 import scala.concurrent.ExecutionContext.Implicits.global
 
 @Singleton
-class SnsController @Inject()(snsSentMessageRepository: SnsSentMessageRepository) extends BaseController with SnsActionBinding {
+class SnsController @Inject()(snsSentMessageRepository: SnsSentMessageRepository, @Named("forcedFailureNamePart") forcedFailureNamePart: String) extends BaseController with SnsActionBinding {
 
   def handleRequest(): Action[FormEncoded] = Action.async(parse.urlFormEncoded) { implicit request =>
 
     bind(request.body) match {
-      case ep: CreatePlatformEndpoint => snsSentMessageRepository.insert(ep)
-        .map(_ => Ok(CreatePlatformEndpointResponse(ep) success))
+      case ep: CreatePlatformEndpoint =>
+        val forcedFailure = ep.registrationToken.contains(forcedFailureNamePart)
+        snsSentMessageRepository.insert(ep, forcedFailure).map { _ =>
+          if (forcedFailure) {
+            BadRequest(CreatePlatformEndpointResponse(ep) failure)
+          } else {
+            Ok(CreatePlatformEndpointResponse(ep) success)}
+        }
         .recover {
           case ex: Exception => InternalServerError(ex.getMessage)
         }
-      case pr: PublishRequest => snsSentMessageRepository.insert(pr)
-        .map(_ => Ok(PublishRequestResponse(pr) success))
+      case pr: PublishRequest =>
+        val forcedFailure = pr.targetArn.contains(forcedFailureNamePart)
+        snsSentMessageRepository.insert(pr, forcedFailure).map { _ =>
+          if (forcedFailure) {
+            BadRequest(PublishRequestResponse(pr) failure)
+          } else {
+            Ok(PublishRequestResponse(pr) success)
+          }
+        }
         .recover {
           case ex:Exception => InternalServerError(ex.getMessage)
         }

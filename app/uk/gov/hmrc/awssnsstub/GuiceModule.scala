@@ -19,8 +19,9 @@ package uk.gov.hmrc.awssnsstub
 import javax.inject.{Inject, Provider}
 
 import com.google.inject.AbstractModule
+import com.google.inject.name.Names.named
 import play.api.Mode.Mode
-import play.api.{Logger, Configuration, Environment}
+import play.api.{Configuration, Environment, Logger}
 import play.modules.reactivemongo.ReactiveMongoComponent
 import reactivemongo.api.DB
 import uk.gov.hmrc.play.config.ServicesConfig
@@ -32,6 +33,7 @@ class GuiceModule(environment: Environment, configuration: Configuration) extend
 
   override def configure(): Unit = {
     bind(classOf[DB]).toProvider(classOf[MongoDbProvider])
+    bind(classOf[String]).annotatedWith(named("forcedFailureNamePart")).toInstance(configuration.getString("forcedFailureNamePart").getOrElse("__FAIL"))
   }
 }
 

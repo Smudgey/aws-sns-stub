@@ -1,15 +1,8 @@
 import sbt._
-import play.sbt.PlayImport._
-import play.core.PlayVersion
-import uk.gov.hmrc.SbtAutoBuildPlugin
-import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin
-import uk.gov.hmrc.versioning.SbtGitVersioning
 
-object MicroServiceBuild extends Build with MicroService {
-
-  val appName = "aws-sns-stub"
-
-  override lazy val appDependencies: Seq[ModuleID] = compile ++ test()
+object AppDependencies {
+  import play.sbt.PlayImport._
+  import play.core.PlayVersion
 
   private val bootstrap = "5.15.0"
   private val logback = "3.1.0"
@@ -45,9 +38,11 @@ object MicroServiceBuild extends Build with MicroService {
       "org.scalactic" %% "scalactic" % scalactic % scope,
       "org.scalatest" %% "scalatest" % scalactic % scope,
       "org.pegdown" % "pegdown" % pegdown % scope,
-      "org.scalatestplus.play" %% "scalatestplus-play" % scalaTestPlus,
+      "org.scalatestplus.play" %% "scalatestplus-play" % scalaTestPlus % scope,
       "com.typesafe.play" %% "play-test" % PlayVersion.current % scope,
       "org.mockito" % "mockito-core" % mockitoCore % scope
     )
   }
+
+  def apply() = compile ++ test()
 }

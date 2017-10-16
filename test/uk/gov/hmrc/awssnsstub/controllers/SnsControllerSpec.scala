@@ -17,10 +17,10 @@
 package uk.gov.hmrc.awssnsstub.controllers
 
 import org.junit.runner.RunWith
-import org.mockito.Matchers._
+import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, when}
 import org.scalatest.junit.JUnitRunner
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import play.api.libs.json.{JsObject, JsString}
 import play.api.mvc.Result
 import play.api.test.FakeRequest

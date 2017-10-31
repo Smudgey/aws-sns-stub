@@ -4,7 +4,7 @@ object AppDependencies {
   import play.core.PlayVersion
   import play.sbt.PlayImport._
 
-  private val bootstrap = "6.9.0"
+  private val bootstrap = "6.11.0"
   private val playReactiveMongo = "6.1.0"
   private val awsSns = "1.11.97"
   private val playHmrcApiVersion = "2.0.0"
